@@ -3,10 +3,21 @@
 
 #include <stdint.h>  // used for definite integer types
 #include <stdbool.h> // used for boolean data type
-#include "grovepi.h" // include grovepi c++ library
+#ifdef __cplusplus
+#include "grovepi.h" // include grovepi c++ library in c++ code
+#endif
 
-extern "C" int digitalRead(uint8_t pin);
+#ifdef __cplusplus
+extern "C" { // allow functions to be callable in C
+#endif
+        int initgrovepi();
 
-extern "C" short analogRead(uint8_t pin);
+        int digitalread(uint8_t pin);
 
-#endif // _GROVE_WRAP_H_
+        short analogread(uint8_t pin);
+
+#ifdef __cplusplus
+}
+#endif // end extern C
+
+#endif // end _GROVE_WRAP_H_
