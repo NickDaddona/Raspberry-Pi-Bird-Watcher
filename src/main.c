@@ -1,11 +1,9 @@
 #include <stdlib.h> // standard library
 #include <stdio.h>  // standard i/o
 #include <unistd.h> // unix standard library
-#include "../lib/grovewrap.h"
+#include "../includes/grove.h"  // access grove functions
 #include "../includes/camera.h" // to access camera functions
 
-#define PIR_ID 8  // pir motion sensor in digital port 8
-#define TEMP_ID 1 // Temperature probe in analog port 1
 
 /**
  * Test program for communicating with raspberry pi sensors
@@ -15,13 +13,16 @@
 int main(void)
 {
         #ifndef __cplusplus
-                printf("WOOOHHH I DID IT\n");
+                printf("Main Program Compiled for C \n");
         #endif
         int result = -1;
-        initgrovepi();
-        while (true) {
-                result = digitalread(PIR_ID);
-                //printf("Result read");
+        initGrove();
+        float temp, humidity;
+        safeDHTread(&temp, &humidity);
+
+        printf("Temp: %fC Humidity: %f%%\n", temp, humidity);
+        for (int i = 0; i < 10; i++) {
+                result = readPIR();
                 if (result) {
                         printf("Motion Detected\n");
                 }
@@ -30,6 +31,7 @@ int main(void)
                 }
                 sleep(5);
         }
-        //takepic(NULL, "test.jpg");
+        takepic(NULL, "test.jpg");
+        printf("Picture taken and saved to current directory\n");
         return 0;
 }
