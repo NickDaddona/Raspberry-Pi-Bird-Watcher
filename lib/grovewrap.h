@@ -3,9 +3,6 @@
 
 #include <stdint.h>  // used for definite integer types
 #include <stdbool.h> // used for boolean data type
-#ifdef __cplusplus
-#include "grovepi.h" // include grovepi c++ library in c++ code
-#endif
 
 /**
  * Created by Nicholas Daddona

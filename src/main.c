@@ -1,8 +1,7 @@
 #include <stdlib.h> // standard library
 #include <stdio.h>  // standard i/o
 #include <unistd.h> // unix standard library
-#include "../includes/grove.h"  // access grove functions
-#include "../includes/camera.h" // to access camera functions
+#include "../includes/sensors.h"  // access sensors
 
 
 /**

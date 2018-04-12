@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "grovepi.h"   // include grovepi library
 #include "grovewrap.h" // include function declarations
 
 /**
