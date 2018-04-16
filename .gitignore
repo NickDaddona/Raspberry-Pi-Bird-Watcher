@@ -1,3 +1,10 @@
+# Vs Code settings
+.vscode
+
+# Sensor data
+pictures/
+enviornment/
+
 # Prerequisites
 *.d
 

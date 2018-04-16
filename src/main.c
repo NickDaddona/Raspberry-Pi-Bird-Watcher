@@ -1,16 +1,17 @@
 #include <stdlib.h> // standard library
 #include <stdio.h>  // standard i/o
 #include <unistd.h> // unix standard library
-#include "../includes/sensors.h"  // access sensors
+#include <dirent.h> // manage directories
+#include "../includes/sensors.h" // access sensors
+#include "../includes/util.h"    // access utility functions
 
 
-/**
- * Test program for communicating with raspberry pi sensors
- * 
- *
- */
+void init(void); // initialze filesystem for program
+
 int main(void)
 {
+        init(); // initialize filesystem
+        /*
         #ifndef __cplusplus
                 printf("Main Program Compiled for C \n");
         #endif
@@ -32,5 +33,22 @@ int main(void)
         }
         takepic(NULL, "test.jpg");
         printf("Picture taken and saved to current directory\n");
+        */
         return 0;
+}
+
+/**
+ * Initializes filesystem used for program
+ * 
+ * If pictures and environment aren't present in the current directory, create them
+ */
+void init(void)
+{
+        if (!direxist(PICTUREPATH)) { // create picture directory if needed
+                createdir(PICTUREPATH);
+        }
+
+        if (!direxist(ENVIORNMENTPATH)) { // create enviornment readings directory if needed
+                createdir(ENVIORNMENTPATH);
+        }
 }

@@ -1,8 +1,11 @@
 #ifndef _SENSORS_H_
 #define _SENSORS_H_
 
+// constants for the subdirectories containing pictures and enviornment log data
+#define PICTUREPATH "./pictures"
+#define ENVIORNMENTPATH "./enviornment"
 
-int takepic(char * options, char * savepath);
+int takepic(char * options);
 
 void initGrove(void);
 

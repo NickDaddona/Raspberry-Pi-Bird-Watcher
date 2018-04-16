@@ -15,12 +15,14 @@
 // helper function
 static int aregoodreadings(float temp, float humidity);
 
+char picpath[22] = "./pictures/YYYY-MM-DD"; // string to be used for save path
+
 /**
  * Used to take pictures using the raspberry pi camera using specified command line
  * arguements that will be saved in a specified directory. If the string parameter that
  * contains the arguements is null, it is assumed no extra options are provided
  */
-int takepic(char *options, char *savepath)
+int takepic(char *options)
 {
         // TODO: Test if directory exists and if it doesn't, create it
         char command[COMMAND_SIZE]; // char array to hold the built camera command
@@ -39,8 +41,7 @@ int takepic(char *options, char *savepath)
                 exit(1);
         }
         else { // print the path to the command
-                tail += sprintf(command + tail, "-o ");
-                tail += sprintf(command + tail, savepath);
+                tail += sprintf(command + tail, "-o %s", savepath);
         }
 
         int result = system(command); // run the command to take a picture
