@@ -7,6 +7,6 @@ void createdir(char *path);
 
 void logtoconsole(char *message);
 
-void logtofile(int fd, char *message);
+void logtofile(char *path, char *message);
 
 #endif

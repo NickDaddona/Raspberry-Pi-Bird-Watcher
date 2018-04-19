@@ -5,9 +5,11 @@
 #define PICTUREPATH "./pictures"
 #define ENVIORNMENTPATH "./enviornment"
 
+void initGrove(void);
+
 int takepic(char * options);
 
-void initGrove(void);
+int recordDHTread(void);
 
 int readPIR(void);
 

@@ -30,7 +30,6 @@ extern "C" {
                         printf("Connection with GrovePi board failed, Exiting\n");
                         exit(1);
                 }
-                printf("Grovepi Connection Established\n");
         }
 
         /**

@@ -1,3 +1,5 @@
+#include <unistd.h> // unix standard library
+#include <fcntl.h>  // filecontrol
 #include <sys/stat.h> // mkdir()
 #include <dirent.h> // opendir() closedir()
 #include <stdlib.h> // exit()
@@ -14,7 +16,6 @@
  * collected. Also helps provide logs to the console to indicate what's currently
  * happening
 */
-
 
 /**
  * Checks if a directory exists
@@ -59,8 +60,7 @@ void createdir(char *path)
                 exit(1); // TODO decide how to handle opened file descriptors
         }
         else { // success conditions
-                strcpy(msgbuf, "Created Directory: "); // build the message
-                strcat(msgbuf, path);
+                sprintf(msgbuf, "Created Directory: %s\n", path); // build the message
                 logtoconsole(msgbuf);
         }
 }
@@ -70,13 +70,39 @@ void createdir(char *path)
  */
 void logtoconsole(char *message)
 {
-        char f_time[] = "HH:MM\0"; // date and time format
+        char f_time[] = "[HH:MM:SS]"; // date and time format
         time_t logtime = time(NULL); // get the current time in milliseconds
-	strftime(f_time, sizeof(f_time), "%H:%M", localtime(&logtime));
-        printf("%s: %s\n", f_time, message); // print the message with time
+        struct tm timep; // buffer for localtime
+        localtime_r(&logtime, &timep); // obtain the broken down time
+	strftime(f_time, sizeof(f_time), "[%H:%M:%S]", &timep); // format the time
+        printf("%s: %s", f_time, message); // print the message with time
 }
 
-void logtofile(int fd, char *message)
+/**
+ * Logs a message to the file path using system calls and append mode
+ */
+void logtofile(char *path, char *message)
 {
+        int tries = 0;
+        int logfd = -1; // filedescriptor
+        while ((logfd = open(path, O_CREAT | O_WRONLY | O_APPEND, S_IRUSR 
+            | S_IWUSR | S_IRGRP | S_IROTH)) == -1 && tries < 5) {
+                tries++; // attempt to open the file, 5 tries max
+        }
+        if (tries == 5) {
+                fprintf(stderr, "Failed to open %s\n%s\n", path, strerror(errno));
+                exit(EXIT_FAILURE); // exit if failed to open the file
+        }
 
+        int msgsz = strlen(message);
+        int byteswritten = 0;
+        int result = 0;
+        while ((result = write(logfd, message + byteswritten, msgsz)) > 0 
+            && byteswritten >= msgsz) { // stop when message is written
+                if (result == -1) {
+                        fprintf(stderr, "Error when writing to %s\n%s\n", path, strerror(errno));
+                        exit(1); // exit if write error
+                }
+                tries++; // write the message to the file, max 5 tries to write fully
+        }
 }
