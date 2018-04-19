@@ -1,9 +1,9 @@
 #ifndef _SENSORS_H_
 #define _SENSORS_H_
 
-// constants for the subdirectories containing pictures and enviornment log data
+// constants for the subdirectories containing pictures and environment log data
 #define PICTUREPATH "./pictures"
-#define ENVIORNMENTPATH "./enviornment"
+#define ENVIRONMENTPATH "./environment"
 
 void initGrove(void);
 

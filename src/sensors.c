@@ -53,7 +53,7 @@ int takepic(char *options)
                 createdir(dirbuf); // create the directory if it doesn't exist
         }
         strftime(namebuf, sizeof(namebuf), "%H:%M:%S", &timep); // format filename
-        tail += sprintf(command + tail, "-o %s/%s", dirbuf, namebuf); // print save location to command
+        tail += sprintf(command + tail, "-o %s/%s.jpg", dirbuf, namebuf); // print save location to command
 
         logtoconsole("Taking picture\n");
         int result = system(command); // run the command to take a picture
@@ -87,7 +87,7 @@ int recordDHTread(void)
         time_t readtime;   // time of reading
         struct tm tmbuf;   // buffer for localtime_r()
         char logbuf[] = "[HH:MM:SS] 00.0C 00.0%\n"; // buffer for logdata
-        char pathbuf[] = "./enviornment/YYYY-MM-DD.txt"; // buffer for filename
+        char pathbuf[] = "./environment/YYYY-MM-DD.txt"; // buffer for filename
         safeDHTread(&temp, &humid); // read the sensor
         readtime = time(NULL); // obtain time of reading
         localtime_r(&readtime, &tmbuf); // break down the time into components
@@ -95,6 +95,7 @@ int recordDHTread(void)
         strftime(pathbuf + 14, 11, "%Y-%m-%d.txt", &tmbuf);    // format the filename
         sprintf(logbuf + 11, "%.1fC %.1f%%\n", temp, humid); // print the data to the buffer
         logtofile(pathbuf, logbuf); // log the data
+        logtoconsole("Environmental Reading Taken");
         return 0;
 }
 

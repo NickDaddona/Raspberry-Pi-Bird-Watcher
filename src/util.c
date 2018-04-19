@@ -3,16 +3,16 @@
 #include <sys/stat.h> // mkdir()
 #include <dirent.h> // opendir() closedir()
 #include <stdlib.h> // exit()
-#include <stdio.h>  // printing to files
+#include <stdio.h>  // printing to console
 #include <time.h>   // for determining the time when logging to console or file
-#include <string.h> // strcpy() and strcat()
+#include <string.h> // strcpy()
 #include <errno.h>  // access to errno
 #include "../includes/util.h" // contains function declarations
 
 /**
  * Created by: Nicholas Daddona
  * 
- * Contains various utilities to help manage the pictures and enviornmental data
+ * Contains various utilities to help manage the pictures and environmental data
  * collected. Also helps provide logs to the console to indicate what's currently
  * happening
 */

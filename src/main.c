@@ -7,7 +7,7 @@
 #include "../includes/sensors.h" // access sensors
 #include "../includes/util.h"    // access utility functions
 
-#define FIFTEENMIN 54000 // number of seconds in fifteenminutes
+#define FIFTEENMIN 900 // number of seconds in fifteenminutes
 
 void init(void); // initialze filesystem for program
 
@@ -51,8 +51,8 @@ void init(void)
         if (!direxist(PICTUREPATH)) { // create picture directory if needed
                 createdir(PICTUREPATH);
         }
-        if (!direxist(ENVIORNMENTPATH)) { // create enviornment readings directory if needed
-                createdir(ENVIORNMENTPATH);
+        if (!direxist(ENVIRONMENTPATH)) { // create environment readings directory if needed
+                createdir(ENVIRONMENTPATH);
         }
 
         initGrove(); // initialize connection with the grovepi board
