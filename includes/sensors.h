@@ -7,7 +7,9 @@
 
 void initGrove(void);
 
-int takepic(char * options);
+void startcamera(char *options);
+
+void takepic(void);
 
 int recordDHTread(void);
 

@@ -4,12 +4,14 @@
 #include <stdbool.h> // true macro
 #include <unistd.h> // unix standard library
 #include <fcntl.h>  // file control
+#include <signal.h> // signal handling
 #include "../includes/sensors.h" // access sensors
 #include "../includes/util.h"    // access utility functions
 
 #define FIFTEENMIN 900 // number of seconds in fifteenminutes
 
 void init(void); // initialze filesystem for program
+void sigint_handler(int signum); // handle sigint
 
 /**
  * Created by Nicholas Daddona
@@ -26,6 +28,7 @@ int main(void)
         time_t current, prev; // time in seconds of last reading and current time
         recordDHTread();   // initial temp and humidity recording for start
         prev = time(NULL); // obtain a time to start
+        startcamera(NULL);
         while (true) {
                 current = time(NULL); // check to see if 15 minutes have passed
                 if ((current - prev) >= FIFTEENMIN) {
@@ -33,7 +36,7 @@ int main(void)
                         prev = current; // record a new previous time
                 }
                 if (readPIR() == 1) { // take a picture if motion is detected
-                        takepic(NULL);
+                        takepic();
                 }
         }
         return EXIT_SUCCESS;
@@ -47,6 +50,7 @@ int main(void)
  */
 void init(void)
 {
+        signal(SIGINT, sigint_handler); // specifiy handler for interrupts
         float temp, humid; // temp variables used to test DHT Sensor
         if (!direxist(PICTUREPATH)) { // create picture directory if needed
                 createdir(PICTUREPATH);
@@ -68,4 +72,13 @@ void init(void)
                 logtoconsole("Communication error with camera, check connection\n");
                 exit(EXIT_FAILURE);
         }
+}
+
+/**
+ * Preforms cleanup before exiting via interrupt
+ */
+void sigint_handler(int signum)
+{
+        system("kill -INT $(pgrep raspistill) > /dev/null"); // kill raspistill process
+        exit(EXIT_SUCCESS); // exit
 }

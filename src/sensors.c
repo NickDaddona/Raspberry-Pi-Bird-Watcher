@@ -1,8 +1,10 @@
+#include <unistd.h> // unix standard library
 #include <stdlib.h> // exit()
 #include <stdio.h>  // printf()
 #include <string.h> // memcpy()
 #include <math.h>   // isnan macro
 #include <time.h>   // localtime(), strftime()
+#include <errno.h>  // access to errno
 #include "../includes/sensors.h" // function declarations
 #include "../includes/util.h"   // utility functions
 #include "../lib/grovewrap.h"  // library wrapper functions
@@ -29,52 +31,62 @@ void initGrove(void)
 }
 
 /**
- * Used to take pictures using the raspberry pi camera using specified command line
- * arguements that will be saved in a specified directory. If the string parameter that
- * contains the arguements is null, it is assumed no extra options are provided.
- * The picture will be saved in a directory named the date of capture in ISO 8601
+ * Starts the raspistill camera in the background in order to take a picture
+ * Raspistill program is started in Signal mode so a USR1 signal can be sent to
+ * it to take a picture when its ready
+ * 
  */
-int takepic(char *options)
+void startcamera(char *options)
 {
         char command[COMMAND_SIZE]; // char array to hold the built camera command
-        char dirbuf[] = "./pictures/YYYY-MM-DD"; // buffer to hold the directory
-        char namebuf[] = "HH:MM:SS"; // buffer to hold the filename
         int tail = 0; // tail of the command
         tail += sprintf(command + tail, "raspistill "); // print the command name to the string
 
         if (options != NULL) { // print the options to the command
                 tail += sprintf(command + tail, options);
         }
+        tail += sprintf(command + tail, "-s -t 0 -o ./Temp.jpg &");
+        int result = system(command); // run the command start the camera
+
+        logtoconsole("Camera Warmed Up\n"); // log results to console
+}
+
+/**
+ * Takes a picture by sending a USR1 signal to the raspistill process started using
+ * startcamera(). Picture will be renamed to the time it was taken
+ * 
+ */
+void takepic(void)
+{
+        char oldname[] = "Temp.jpg"; // old filename
+        char dirbuf[] = "./pictures/YYYY-MM-DD"; // buffer to hold the directory
+        char namebuf[] = "HH:MM:SS.jpg"; // buffer to hold the filename
+        char newname[] = "./pictures/YYYY-MM-DD/HH:MM:SS.jpg"; // new filename
+
         time_t pictime = time(NULL);
         struct tm timep; // buffer for localtime
         localtime_r(&pictime, &timep); // obtain the broken down time
-	strftime(dirbuf + 11, 11, "%Y-%m-%d", &timep); // format the time
+	strftime(dirbuf + 11, 11, "%Y-%m-%d", &timep); // format the date
         if (direxist(dirbuf) == 0) {
                 createdir(dirbuf); // create the directory if it doesn't exist
         }
-        strftime(namebuf, sizeof(namebuf), "%H:%M:%S", &timep); // format filename
-        tail += sprintf(command + tail, "-o %s/%s.jpg", dirbuf, namebuf); // print save location to command
 
         logtoconsole("Taking picture\n");
-        int result = system(command); // run the command to take a picture
+        // run the command to take a picture
+        int result = system("kill -USR1 $(pgrep raspistill)"); // wait for picture
+        sleep(5); // wait 5 seconds
+        strftime(namebuf, sizeof(namebuf), "%H:%M:%S.jpg", &timep); // format filename
+        sprintf(newname, "%s/%s", dirbuf, namebuf);
 
-        // TODO: Determine how many times to try to take a picture?
-        // Taking a picture takes 6 seconds
-        if (result == 64) { // check for errors
-                fprintf(stderr, "Bad parameter passed to camera\n");
+        int nameres = rename(oldname, newname); // rename the file
+        if (nameres == -1) {
+                fprintf(stderr, "Error renaming file %s\n%s\n", oldname, strerror(errno));
                 exit(EXIT_FAILURE);
         }
-        if (result == 70) {
-                fprintf(stderr, "Camera or software error\n");
-                exit(EXIT_FAILURE);
-        }
-        if (result == 130) {
-                fprintf(stderr, "raspistill terminated by user\n");
-                exit(EXIT_FAILURE);
-        }
-        sprintf(command, "Picture saved with name %s in %s/\n", namebuf, dirbuf);
-        logtoconsole(command); // reuse command buffer to log to console
-        return 0;
+
+        char output[COMMAND_SIZE];
+        sprintf(output, "Picture saved with name %s in %s/\n", namebuf, dirbuf);
+        logtoconsole(output); // report result
 }
 
 /**
@@ -95,7 +107,7 @@ int recordDHTread(void)
         strftime(pathbuf + 14, 11, "%Y-%m-%d.txt", &tmbuf);    // format the filename
         sprintf(logbuf + 11, "%.1fC %.1f%%\n", temp, humid); // print the data to the buffer
         logtofile(pathbuf, logbuf); // log the data
-        logtoconsole("Environmental Reading Taken");
+        logtoconsole("Environmental Reading Taken\n");
         return 0;
 }
 
