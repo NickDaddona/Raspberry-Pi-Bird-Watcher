@@ -3,6 +3,10 @@
 #include "grovepi.h"   // include grovepi library
 #include "grovewrap.h" // include function declarations
 
+extern "C" {
+        #include "../includes/util.h" // access to cleanup()
+}
+
 /**
  * Created by Nicholas Daddona
  * 
@@ -28,7 +32,8 @@ extern "C" {
                         GrovePi::initGrovePi(); // attempt to establish connection
                 } catch (GrovePi::I2CError &e) {
                         printf("Connection with GrovePi board failed, Exiting\n");
-                        exit(1);
+                        cleanup(); // cleanup before exiting
+                        exit(EXIT_FAILURE); // exit after failure
                 }
         }
 
@@ -42,7 +47,8 @@ extern "C" {
                         GrovePi::writeBlock(command, pinnumber, opt1, opt2);
                 } catch (GrovePi::I2CError &e) { // exit on failure
                         printf("Writeblock Error \n%s", e.detail());
-                        exit(1);
+                        cleanup(); // cleanup before exiting
+                        exit(EXIT_FAILURE); // exit after failure
                 }
         }
 
@@ -58,7 +64,8 @@ extern "C" {
                         bytesread = GrovePi::readBlock(datablock); // attempt read
                 } catch (GrovePi::I2CError &e) { // exit on failure
                         printf("Readblock Error \n%s", e.detail());
-                        exit(1);
+                        cleanup(); // cleanup before exiting
+                        exit(EXIT_FAILURE); // exit after failure
                 }
                 return bytesread;
         }
@@ -75,7 +82,8 @@ extern "C" {
                         outputcode = GrovePi::readByte(); // read a byte
                 } catch (GrovePi::I2CError &e) {
                         printf("Error Reading byte \n%s", e.detail());
-                        exit(1);
+                        cleanup(); // cleanup before exiting
+                        exit(EXIT_FAILURE); // exit after failure
                 }
                 return outputcode;
         }
@@ -93,7 +101,8 @@ extern "C" {
                 } catch (GrovePi::I2CError &e) {
                         printf("Error Communicating with device in port D%d, Exiting\n", pin);
                         printf("%s", e.detail());
-                        exit(1);
+                        cleanup(); // cleanup before exiting
+                        exit(EXIT_FAILURE); // exit after failure
                 }
                 return result ? 1 : 0; // test if will work, otherwise return an integer
         }
@@ -110,7 +119,8 @@ extern "C" {
                 } catch (GrovePi::I2CError &e) {
                         printf("Error Communicating with device in port A%d, Exiting\n", pin);
                         printf("%s\n", e.detail());
-                        exit(1);
+                        cleanup(); // cleanup before exiting
+                        exit(EXIT_FAILURE); // exit after failure
                 }
                 return result;
         }

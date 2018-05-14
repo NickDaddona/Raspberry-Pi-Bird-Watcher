@@ -1,6 +1,8 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+void cleanup(void);
+
 int direxist(char *path);
 
 void createdir(char *path);

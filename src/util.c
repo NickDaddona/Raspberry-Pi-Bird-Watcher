@@ -18,6 +18,15 @@
 */
 
 /**
+ * Preform cleanup operations before exiting
+ * 
+ */
+void cleanup(void)
+{
+        //system("kill -INT $(pgrep raspistill)"); // kill background raspistill process
+}
+
+/**
  * Checks if a directory exists
  * 
  * Returns 1 if it exists, 0 otherwise
@@ -57,7 +66,8 @@ void createdir(char *path)
         }
         if (result != 0) { // exit if meeting max tries
                 fprintf(stderr, "Failed to create %s:/n%s", path, strerror(errno));
-                exit(1); // TODO decide how to handle opened file descriptors
+                cleanup();
+                exit(EXIT_FAILURE);
         }
         else { // success conditions
                 sprintf(msgbuf, "Created Directory: %s\n", path); // build the message
@@ -91,6 +101,7 @@ void logtofile(char *path, char *message)
         }
         if (tries == 5) {
                 fprintf(stderr, "Failed to open %s\n%s\n", path, strerror(errno));
+                cleanup();
                 exit(EXIT_FAILURE); // exit if failed to open the file
         }
 
@@ -101,7 +112,8 @@ void logtofile(char *path, char *message)
             && byteswritten >= msgsz) { // stop when message is written
                 if (result == -1) {
                         fprintf(stderr, "Error when writing to %s\n%s\n", path, strerror(errno));
-                        exit(1); // exit if write error
+                        cleanup();
+                        exit(EXIT_FAILURE); // exit if write error
                 }
                 tries++; // write the message to the file, max 5 tries to write fully
         }

@@ -45,7 +45,7 @@ void startcamera(char *options)
         if (options != NULL) { // print the options to the command
                 tail += sprintf(command + tail, options);
         }
-        tail += sprintf(command + tail, "-s -t 0 -o ./Temp.jpg &");
+        tail += sprintf(command + tail, "-s -t 0 -o ./Temp.jpg > /dev/null 2>&1 &");
         int result = system(command); // run the command start the camera
 
         logtoconsole("Camera Warmed Up\n"); // log results to console
@@ -81,6 +81,7 @@ void takepic(void)
         int nameres = rename(oldname, newname); // rename the file
         if (nameres == -1) {
                 fprintf(stderr, "Error renaming file %s\n%s\n", oldname, strerror(errno));
+                cleanup();
                 exit(EXIT_FAILURE);
         }
 
@@ -136,10 +137,12 @@ void safeDHTread(float *temp, float *humidity)
         }
         if (isnan(*temp) || isnan(*humidity)) {
                 printf("DHT NaN readings check port");
+                cleanup();
                 exit(EXIT_FAILURE);
         }
         if (!aregoodreadings(*temp, *humidity)) {
                 printf("DHT bad readings check port");
+                cleanup();
                 exit(EXIT_FAILURE);
         }
 }
