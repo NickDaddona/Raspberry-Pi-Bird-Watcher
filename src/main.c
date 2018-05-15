@@ -28,8 +28,6 @@ int sigalrm_flag = 0; // flag set to true when alarm goes off
 int main(void)
 {
         init(); // run startup check
-        startcamera(NULL); // start camera
-        alarm(FIFTEENMIN); // set the initial alarm for 15 minutes
         while (sigint_flag == 0) {
                 if (sigalrm_flag) {
                         recordDHTread(); // record an envoirnmental reading
@@ -54,7 +52,6 @@ void init(void)
 {
         signal(SIGINT, signalhandler);  // specifiy handler for interrupts
         signal(SIGALRM, signalhandler); // specify handler for alarm
-        float temp, humid; // temp variables used to test DHT Sensor
         if (!direxist(PICTUREPATH)) { // create picture directory if needed
                 createdir(PICTUREPATH);
         }
@@ -65,15 +62,11 @@ void init(void)
         logtoconsole("Connection Established with GrovePi Board\n");
         readPIR(); // test the motion sensor
         logtoconsole("PIR Motion Sensor detected\n");
+        float temp, humid; // temp variables used to test DHT Sensor
         safeDHTread(&temp, &humid); // test the dht sensor
         logtoconsole("Temperature and Humidity Sensor Detected\n");
-        if (system("raspistill -t 5") == 0) { // test the camera
-                logtoconsole("Camera Module Detected\n");
-        }
-        else { // error handling for camera connection failing
-                logtoconsole("Communication error with camera, check connection\n");
-                exit(EXIT_FAILURE);
-        }
+        startcamera(NULL); // test the camera and start background camera process
+        alarm(FIFTEENMIN); // set the initial alarm for 15 minutes
 }
 
 /**

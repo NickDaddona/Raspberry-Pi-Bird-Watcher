@@ -41,7 +41,8 @@ int direxist(char *path)
                 }
                 else { // else print the specified error
                         fprintf(stderr, "Error when test opening %s: %s\n", path, strerror(errno));
-                        exit(1); // exit on any other error
+                        cleanup();
+                        exit(EXIT_FAILURE); // exit on any other error
                 }
         }
         else {

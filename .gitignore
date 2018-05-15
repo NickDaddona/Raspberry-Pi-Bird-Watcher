@@ -5,6 +5,9 @@
 pictures/
 environment/
 
+# Directory for object files
+/out
+
 # Prerequisites
 *.d
 

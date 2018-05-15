@@ -38,6 +38,13 @@ void initGrove(void)
  */
 void startcamera(char *options)
 {
+        if (system("raspistill -t 5") == 0) { // test the camera
+                logtoconsole("Camera Module Detected\n");
+        }
+        else { // error handling for camera connection failing
+                logtoconsole("Communication error with camera, check connection\n");
+                exit(EXIT_FAILURE);
+        }
         char command[COMMAND_SIZE]; // char array to hold the built camera command
         int tail = 0; // tail of the command
         tail += sprintf(command + tail, "raspistill "); // print the command name to the string
@@ -47,7 +54,10 @@ void startcamera(char *options)
         }
         tail += sprintf(command + tail, "-s -t 0 -o ./Temp.jpg > /dev/null 2>&1 &");
         int result = system(command); // run the command start the camera
-
+        if (result != 0) {
+                fprintf(stderr, "Error Communicating with the Camera, test connection");
+                exit(EXIT_FAILURE); // exit if camera failed to start
+        }
         logtoconsole("Camera Warmed Up\n"); // log results to console
 }
 
