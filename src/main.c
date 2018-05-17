@@ -13,8 +13,8 @@
 void init(void); // initialze filesystem for program
 void signalhandler(int signum); // handle sigint and sigalarm
 
-int sigint_flag = 0;
-int sigalrm_flag = 0; // flag set to true when alarm goes off
+int sigint_flag = 0;  // flag set to 1 when process recieves sigint
+int sigalrm_flag = 0; // flag set to 1 when alarm goes off
 
 /**
  * Created by Nicholas Daddona
@@ -38,7 +38,6 @@ int main(void)
                         takepic();
                 }
         }
-        cleanup(); // cleanup before exiting
         return EXIT_SUCCESS; // exit successfully
 }
 

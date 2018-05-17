@@ -23,7 +23,7 @@
  */
 void cleanup(void)
 {
-        //system("kill -INT $(pgrep raspistill)"); // kill background raspistill process
+        system("kill -KILL $(pgrep raspistill)"); // kill background raspistill process
 }
 
 /**
@@ -87,6 +87,52 @@ void logtoconsole(char *message)
         localtime_r(&logtime, &timep); // obtain the broken down time
 	strftime(f_time, sizeof(f_time), "[%H:%M:%S]", &timep); // format the time
         printf("%s: %s", f_time, message); // print the message with time
+}
+
+/**
+ * Reads the Entire contents of a file into a dynamically allocated buffer
+ * The buffer is null terminated and thus its size can be determined with strlen()
+ * Buffer must be deallocated with free once it is no longer needed/in use
+ */
+char * readfromfile(char *name)
+{
+        int srcfd, bytesread, totalread = 0;
+        char pathbuf[256]; // buffer for filepath
+        char *buffer; // buffer for file contents
+        struct stat statbuf; // buffer for stat()
+        if (*(name) != '/' || strncmp(name, "./", 2) != 0 
+            || strncmp(name, "../", 3) != 0) { // append ./ to filename
+            sprintf(pathbuf,"./%s", name);
+        }
+        else {
+                sprintf(pathbuf, "%s", name);
+        }
+
+        if (stat(pathbuf, &statbuf) == -1) { // stat the file
+                fprintf(stderr, "Stat failed on %s\n%s", name, strerror(errno));
+                exit(EXIT_FAILURE);
+        }
+        
+        // create a buffer big enough to store the contents of the file
+        if ((buffer = (char *) calloc(sizeof(char), statbuf.st_size + 1)) == NULL) { 
+                fprintf(stderr, "Error allocation failed \n%s", strerror(errno));
+                exit(EXIT_FAILURE);
+        }
+        
+        if ((srcfd = open(name, O_RDONLY)) == -1) { // open the file for reading
+                fprintf(stderr, "Error opening %s\n%s", name, strerror(errno));
+                exit(EXIT_FAILURE);
+        }
+
+        while ((bytesread = read(srcfd, buffer, statbuf.st_size) > 0)) { // read the file
+                totalread += bytesread; // keep track of total bytes
+        }
+        if (bytesread == -1) { // exit if there was a read failure
+                fprintf(stderr, "Error Reading %s\n%s\n", name, strerror(errno));
+                exit(1);
+        }
+        close(srcfd); // close the opened file once reading finishes
+        return buffer; // return a pointer to the allocated block        
 }
 
 /**

@@ -7,6 +7,7 @@
 #include <errno.h>  // access to errno
 #include "../includes/sensors.h" // function declarations
 #include "../includes/util.h"   // utility functions
+#include "../includes/thingspeak.h" // access to thingspeak functions
 #include "../lib/grovewrap.h"  // library wrapper functions
 
 #define COMMAND_SIZE 128 // size of the buffer used to build the camera command
@@ -16,7 +17,9 @@
 #define DHT_TYPE 0 // type of dht sensor, 0 for blue 1 for white
 #define PIR_ID   8 // PIR sensor connected to digital port 8
 
-// helper function
+// helper functions
+static void localrecord(float temp, float humid);
+static void uploadrecord(float temp, float humid);
 static int aregoodreadings(float temp, float humidity);
 
 /**
@@ -107,19 +110,39 @@ void takepic(void)
 int recordDHTread(void)
 {
         float temp, humid; // temperature and humitity
+        safeDHTread(&temp, &humid); // read the sensor
+        localrecord(temp, humid); // save a local record
+        uploadrecord(temp, humid); // upload to thingspeak
+        logtoconsole("Environmental Reading Taken\n");
+        return 0;
+}
+
+/**
+ * Records Environmental data under a text file locally with the time of the reading
+ * 
+ */
+static void localrecord(float temp, float humid)
+{
         time_t readtime;   // time of reading
         struct tm tmbuf;   // buffer for localtime_r()
         char logbuf[] = "[HH:MM:SS] 00.0C 00.0%\n"; // buffer for logdata
         char pathbuf[] = "./environment/YYYY-MM-DD.txt"; // buffer for filename
-        safeDHTread(&temp, &humid); // read the sensor
         readtime = time(NULL); // obtain time of reading
         localtime_r(&readtime, &tmbuf); // break down the time into components
         strftime(logbuf, 10, "[%H:%M:%S]", &tmbuf); // format the time into the string
         strftime(pathbuf + 14, 11, "%Y-%m-%d.txt", &tmbuf);    // format the filename
         sprintf(logbuf + 11, "%.1fC %.1f%%\n", temp, humid); // print the data to the buffer
         logtofile(pathbuf, logbuf); // log the data
-        logtoconsole("Environmental Reading Taken\n");
-        return 0;
+}
+
+/**
+ * Uploads Environmental data to thingspeak using libcurl
+ * 
+ */
+static void uploadrecord(float temp, float humid)
+{
+        loadapikey(); // ensure the api key is read
+        uploaddata(temp, humid); // perform the upload
 }
 
 /**

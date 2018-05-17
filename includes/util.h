@@ -9,6 +9,8 @@ void createdir(char *path);
 
 void logtoconsole(char *message);
 
+char * readfromfile(char *name);
+
 void logtofile(char *path, char *message);
 
 #endif

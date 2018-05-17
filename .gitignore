@@ -1,6 +1,9 @@
 # Vs Code settings
 .vscode
 
+# Thingspeak API key
+API-KEY
+
 # Sensor data
 pictures/
 environment/
