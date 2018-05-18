@@ -23,7 +23,8 @@
  */
 void cleanup(void)
 {
-        system("kill -KILL $(pgrep raspistill)"); // kill background raspistill process
+         // kill background raspistill process, redirect all output into /dev/null
+        system("kill -KILL $(pgrep raspistill) > /dev/null 2>&1 ");
 }
 
 /**

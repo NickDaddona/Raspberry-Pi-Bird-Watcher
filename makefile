@@ -1,5 +1,5 @@
 install: main.o sensors.o thingspeak.o util.o grovewrap.o # link object files
-	g++ -o bird-watcher ./out/main.o ./out/sensors.o ./out/thingspeak.o ./out/util.o ./out/grovewrap.o -lgrovepicpp -lcurl
+	g++ -o bird-watcher ./out/main.o ./out/sensors.o ./out/thingspeak.o ./out/util.o ./out/grovewrap.o -lgrovepicpp -lcurl -lrt
 
 main.o: sensors.o ./src/main.c #build main.c
 	g++ -o ./out/main.o -c -x c ./src/main.c -Wall

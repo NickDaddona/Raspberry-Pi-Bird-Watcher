@@ -36,7 +36,8 @@ void initGrove(void)
 /**
  * Starts the raspistill camera in the background in order to take a picture
  * Raspistill program is started in Signal mode so a USR1 signal can be sent to
- * it to take a picture when its ready
+ * it to take a picture when its ready. This way the camera doesn't have to warm
+ * up before taking a picture.
  * 
  */
 void startcamera(char *options)
@@ -58,7 +59,7 @@ void startcamera(char *options)
         tail += sprintf(command + tail, "-s -t 0 -o ./Temp.jpg > /dev/null 2>&1 &");
         int result = system(command); // run the command start the camera
         if (result != 0) {
-                fprintf(stderr, "Error Communicating with the Camera, test connection");
+                fprintf(stderr, "Error Communicating with the Camera, check connection");
                 exit(EXIT_FAILURE); // exit if camera failed to start
         }
         logtoconsole("Camera Warmed Up\n"); // log results to console
@@ -86,8 +87,13 @@ void takepic(void)
 
         logtoconsole("Taking picture\n");
         // run the command to take a picture
-        int result = system("kill -USR1 $(pgrep raspistill)"); // wait for picture
-        sleep(5); // wait 5 seconds
+        int result = system("kill -USR1 $(pgrep raspistill) > /dev/null 2>&1");
+        if (result != 0) {
+                fprintf(stderr, "Error sending signal to camera");
+                cleanup();
+                exit(EXIT_FAILURE); // exit if camera could not be sent a signal
+        }
+        sleep(1); // wait for the picture to show up
         strftime(namebuf, sizeof(namebuf), "%H:%M:%S.jpg", &timep); // format filename
         sprintf(newname, "%s/%s", dirbuf, namebuf);
 
