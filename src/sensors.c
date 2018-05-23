@@ -7,7 +7,7 @@
 #include <errno.h>  // access to errno
 #include "../includes/sensors.h" // function declarations
 #include "../includes/util.h"   // utility functions
-#include "../includes/thingspeak.h" // access to thingspeak functions
+#include "../includes/networking.h" // access to thingspeak functions
 #include "../lib/grovewrap.h"  // library wrapper functions
 
 #define COMMAND_SIZE 128 // size of the buffer used to build the camera command
@@ -103,10 +103,13 @@ void takepic(void)
                 cleanup();
                 exit(EXIT_FAILURE);
         }
-
         char output[COMMAND_SIZE];
         sprintf(output, "Picture saved with name %s in %s/\n", namebuf, dirbuf);
         logtoconsole(output); // report result
+
+        loadcredentials(); // ensure the oauth key is loaded
+        uploadpicture(newname);
+        logtoconsole("Picture Uploaded to Imgur");
 }
 
 /**
@@ -147,7 +150,7 @@ static void localrecord(float temp, float humid)
  */
 static void uploadrecord(float temp, float humid)
 {
-        loadapikey(); // ensure the api key is read
+        loadcredentials(); // ensure the api key is read
         uploaddata(temp, humid); // perform the upload
 }
 

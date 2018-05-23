@@ -7,6 +7,7 @@
 #include <time.h>   // for determining the time when logging to console or file
 #include <string.h> // strcpy()
 #include <errno.h>  // access to errno
+#include "../includes/networking.h" // access to dumpcredentials()
 #include "../includes/util.h" // contains function declarations
 
 /**
@@ -25,6 +26,7 @@ void cleanup(void)
 {
          // kill background raspistill process, redirect all output into /dev/null
         system("kill -KILL $(pgrep raspistill) > /dev/null 2>&1 ");
+        dumpcredentials(); // free memory allocated for credentials
 }
 
 /**

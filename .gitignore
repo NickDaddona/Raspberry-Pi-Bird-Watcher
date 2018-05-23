@@ -1,8 +1,12 @@
 # Vs Code settings
 .vscode
 
-# Thingspeak API key
-API-KEY
+# API Keys
+IMGUR-KEY
+THINGSPEAK-KEY
+
+# Imgur key refresh info
+Imgur-Info
 
 # Sensor data
 pictures/
