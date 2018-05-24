@@ -108,8 +108,9 @@ void takepic(void)
         logtoconsole(output); // report result
 
         loadcredentials(); // ensure the oauth key is loaded
-        uploadpicture(newname);
-        logtoconsole("Picture Uploaded to Imgur");
+        logtoconsole("Beginning Picture Upload\n");
+        uploadpicture(newname, &timep);
+        logtoconsole("Picture Uploaded to Imgur\n");
 }
 
 /**

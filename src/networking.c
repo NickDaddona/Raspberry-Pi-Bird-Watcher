@@ -83,13 +83,18 @@ size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
 /**
  * Uploads a picture to Imgur
  * 
+ * path is formatted ./pictures/YYYY-MM-DD/HH:MM:SS.jpg
+ * timep is a pointer to a tm struct formed when the picture was saved to disk
  */
-void uploadpicture(char *path)
+void uploadpicture(char *path, struct tm *timep)
 {
         char authorization[] = "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+        char description[] = "Picture taken on YYYY-MM-DD at HH:MM"; // description for the picture
         sprintf(authorization, "Authorization: Bearer %s", imgurkey); // print the oauth key
-        CURLcode res;
-        CURL *curl;
+        strftime(description, sizeof(description), "Picture taken on %Y-%m-%d at %H:%M", timep);
+
+        CURLcode res; // result from curl
+        CURL *curl; // pointer to curl handle
         struct curl_httppost *post1 = NULL;
         struct curl_httppost *postend = NULL;
         struct curl_slist *slist1 = NULL;
@@ -106,9 +111,14 @@ void uploadpicture(char *path)
                         CURLFORM_COPYNAME, "album",
                         CURLFORM_COPYCONTENTS, "h2XmLmn",
                         CURLFORM_END);
-        
+
+                curl_formadd(&post1, &postend, // add the description of the picture
+                        CURLFORM_COPYNAME, "description",
+                        CURLFORM_COPYCONTENTS, description,
+                        CURLFORM_END);
+
                 // add the header
-                slist1 = curl_slist_append(slist1, "Authorization: Bearer 74f5458917875a384fb4cce7c25d6b5cdfbcf907");
+                slist1 = curl_slist_append(slist1, authorization); // add the oauth key
                 slist1 = curl_slist_append(slist1, "content-type: multipart/form-data;");
 
                 curl_easy_setopt(curl, CURLOPT_URL, "https://api.imgur.com/3/image");
@@ -121,7 +131,8 @@ void uploadpicture(char *path)
                 curl_easy_setopt(curl, CURLOPT_SSH_KNOWNHOSTS, "/home/pi/.ssh/known_hosts");
                 curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
                 curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-
+                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data); // override writing to stdout
+                
                 res = curl_easy_perform(curl);
 
                 if(res != CURLE_OK) { // check for errors

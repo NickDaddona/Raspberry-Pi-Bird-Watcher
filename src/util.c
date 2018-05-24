@@ -90,6 +90,7 @@ void logtoconsole(char *message)
         localtime_r(&logtime, &timep); // obtain the broken down time
 	strftime(f_time, sizeof(f_time), "[%H:%M:%S]", &timep); // format the time
         printf("%s: %s", f_time, message); // print the message with time
+        fflush(stdout); // flush stdout
 }
 
 /**
