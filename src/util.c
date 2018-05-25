@@ -43,7 +43,7 @@ int direxist(char *path)
                         retval = 0;
                 }
                 else { // else print the specified error
-                        fprintf(stderr, "Error when test opening %s: %s\n", path, strerror(errno));
+                        fprintf(stderr, "Error when test opening %s:\n%s\n", path, strerror(errno));
                         cleanup();
                         exit(EXIT_FAILURE); // exit on any other error
                 }
@@ -69,7 +69,7 @@ void createdir(char *path)
                 tries++;
         }
         if (result != 0) { // exit if meeting max tries
-                fprintf(stderr, "Failed to create %s:/n%s", path, strerror(errno));
+                fprintf(stderr, "Failed to create %s:\n%s\n", path, strerror(errno));
                 cleanup();
                 exit(EXIT_FAILURE);
         }
@@ -113,13 +113,13 @@ char * readfromfile(char *name)
         }
 
         if (stat(pathbuf, &statbuf) == -1) { // stat the file
-                fprintf(stderr, "Stat failed on %s\n%s", name, strerror(errno));
+                fprintf(stderr, "Stat failed on %s\n%s\n", name, strerror(errno));
                 exit(EXIT_FAILURE);
         }
         
         // create a buffer big enough to store the contents of the file
         if ((buffer = (char *) calloc(sizeof(char), statbuf.st_size + 1)) == NULL) { 
-                fprintf(stderr, "Error allocation failed \n%s", strerror(errno));
+                fprintf(stderr, "Buffer Allocation for file failed \n%s\n", strerror(errno));
                 exit(EXIT_FAILURE);
         }
         

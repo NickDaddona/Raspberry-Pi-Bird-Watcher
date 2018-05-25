@@ -89,9 +89,9 @@ size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
 void uploadpicture(char *path, struct tm *timep)
 {
         char authorization[] = "Authorization: Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-        char description[] = "Picture taken on YYYY-MM-DD at HH:MM"; // description for the picture
+        char description[] = "Picture taken on YYYY-MM-DD at HH:MM:SS"; // description for the picture
         sprintf(authorization, "Authorization: Bearer %s", imgurkey); // print the oauth key
-        strftime(description, sizeof(description), "Picture taken on %Y-%m-%d at %H:%M", timep);
+        strftime(description, sizeof(description), "Picture taken on %Y-%m-%d at %H:%M:%S", timep);
 
         CURLcode res; // result from curl
         CURL *curl; // pointer to curl handle
